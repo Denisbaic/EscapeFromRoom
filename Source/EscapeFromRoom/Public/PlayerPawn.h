@@ -7,6 +7,8 @@
 #include "GameFramework/DefaultPawn.h"
 #include "PlayerPawn.generated.h"
 
+class UGrabberComponent;
+
 UCLASS()
 class ESCAPEFROMROOM_API APlayerPawn : public ADefaultPawn
 {
@@ -19,7 +21,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
+	//UPhysicsHandleComponent* HandleComponent;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

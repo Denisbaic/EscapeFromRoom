@@ -3,17 +3,17 @@
 
 #include "GrabberComponent.h"
 #include "Engine/World.h"
-#include "Runtime/Engine/Public/DrawDebugHelpers.h"
+#include "Runtime/Engine/Classes/PhysicsEngine/PhysicsHandleComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/PrimitiveComponent.h"
 
 // Sets default values for this component's properties
 UGrabberComponent::UGrabberComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
+	
 	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
 }
 
 
@@ -21,9 +21,8 @@ UGrabberComponent::UGrabberComponent()
 void UGrabberComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// ...
-	
+	FindPhysicsHandleComponent();
+	SetupInputComponent();
 }
 
 
@@ -31,28 +30,90 @@ void UGrabberComponent::BeginPlay()
 void UGrabberComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	GetItemByRayCast(300.f);
-	// ...
+
+	if (!PhysicsHandle) { return; }
+	// if the physics handle is attached
+	if (PhysicsHandle->GrabbedComponent)
+	{
+		// move the object that we're holding
+		PhysicsHandle->SetTargetLocation(GetReachLineEnd());
+	}
+}
+void UGrabberComponent::FindPhysicsHandleComponent()
+{
+	PhysicsHandle = GetOwner()->FindComponentByClass<UPhysicsHandleComponent>();
+	if (!PhysicsHandle)
+	{
+		UE_LOG(LogTemp, Error, TEXT("%s missing physics handle component"), *GetOwner()->GetName())
+	}
+}
+void UGrabberComponent::SetupInputComponent()
+{
+	if(GetOwner()->InputComponent)
+	{
+		GetOwner()->InputComponent->BindAction("GetItem", IE_Pressed, this, &UGrabberComponent::Grab);
+		GetOwner()->InputComponent->BindAction("GetItem", IE_Released, this, &UGrabberComponent::Release);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("%s missing input component"), *GetOwner()->GetName())
+	}
 }
 
-AActor * UGrabberComponent::GetItemByRayCast(float RayLength) const
+
+FVector UGrabberComponent::GetReachLineStart() const
 {
-	FHitResult HitResult;
-	
-	FVector PlayerViewLocation;
+	FVector PlayerViewPointLocation;
+	FRotator PlayerViewPointRotation;
+	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
+		PlayerViewPointLocation,
+		PlayerViewPointRotation
+	);
+	return PlayerViewPointLocation;
+}
+
+FVector UGrabberComponent::GetReachLineEnd() const
+{
+	FVector  PlayerViewLocation;
 	FRotator PlayerViewRotation;
+	//Setting PlayerViewLocation and PlayerViewRotation
 	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(PlayerViewLocation, PlayerViewRotation);
 
-	const FVector EndLocation = PlayerViewLocation + PlayerViewRotation.Vector()*RayLength;
-
-	FCollisionQueryParams TraceParams(FName(TEXT("InteractTrace")), true,GetOwner());
-	
-	//(GetWorld(), PlayerViewLocation, EndLocation, FColor::Red, false, GetWorld()->DeltaTimeSeconds, 0, 10);
-	if(GetWorld()->LineTraceSingleByObjectType(HitResult, PlayerViewLocation, EndLocation, FCollisionObjectQueryParams(ECC_WorldDynamic),TraceParams))
-	{
-		//UE_LOG(LogTemp, Warning, TEXT("grabbed %s"), *HitResult.Actor->GetName());
-		return HitResult.Actor.Get();
-	}
-	return nullptr;
+	return  PlayerViewLocation + PlayerViewRotation.Vector()*RayLength;
 }
 
+FHitResult UGrabberComponent::GetItemByRayCast() const
+{
+	FHitResult HitResult;
+
+	const FVector EndLocation = GetReachLineEnd();
+
+	const FCollisionQueryParams TraceParams(FName(TEXT("InteractTrace")), true,GetOwner());
+
+	if(GetWorld()->LineTraceSingleByObjectType(HitResult, GetReachLineStart(), EndLocation, FCollisionObjectQueryParams(ECC_PhysicsBody), TraceParams))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("%s"), *HitResult.Actor.Get()->GetName());
+	}
+
+	
+	return HitResult;
+}
+
+void UGrabberComponent::Grab()
+{
+	const FHitResult HitResult = GetItemByRayCast();
+	const auto ActorHit = HitResult.Actor;
+
+	if(!ActorHit.Get())
+		return;
+
+	const auto ComponentUnderHit = HitResult.Component.Get();
+
+	PhysicsHandle->GrabComponent(ComponentUnderHit, NAME_None, ComponentUnderHit->GetOwner()->GetActorLocation(), true);
+
+}
+
+void UGrabberComponent::Release()
+{
+	PhysicsHandle->ReleaseComponent();
+}

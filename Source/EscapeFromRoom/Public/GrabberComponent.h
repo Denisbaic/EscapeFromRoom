@@ -6,15 +6,22 @@
 #include "Components/ActorComponent.h"
 #include "GrabberComponent.generated.h"
 
+class UPhysicsHandleComponent;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ESCAPEFROMROOM_API UGrabberComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:	
+public:
+	void SetupInputComponent();
 	// Sets default values for this component's properties
 	UGrabberComponent();
+
+	UPROPERTY(BlueprintReadWrite,EditAnywhere)
+	float RayLength = 100.f;
+
+	UPhysicsHandleComponent* PhysicsHandle;
 
 protected:
 	// Called when the game starts
@@ -23,6 +30,11 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	AActor* GetItemByRayCast(float RayLength = 300.f) const;
-		
+	void FindPhysicsHandleComponent();
+	FVector GetReachLineStart() const;
+	FVector GetReachLineEnd() const;
+	FHitResult GetItemByRayCast() const;
+
+	void Grab();
+	void Release();
 };
