@@ -18,8 +18,6 @@ UOpenDoorComponent::UOpenDoorComponent()
 void UOpenDoorComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	
 }
 
 float UOpenDoorComponent::GetTotalMassOfActorsOnPlate() const
@@ -32,16 +30,12 @@ float UOpenDoorComponent::GetTotalMassOfActorsOnPlate() const
 
 	TriggerVolume->GetOverlappingActors(OverlappingActors);
 
-	
-
 	TArray<UPrimitiveComponent*> OverlappingComponents;
 	TriggerVolume->GetOverlappingComponents(OverlappingComponents);
-	UE_LOG(LogTemp, Warning, TEXT("%d"), OverlappingComponents.Num());
 
-	for(const auto& Actor: OverlappingComponents)
+	for(const auto& Actor: OverlappingActors)
 	{
-		//TotalMass+=Actor->FindComponentByClass<UPrimitiveComponent>()->GetMass();
-		TotalMass += Actor->GetMass();
+		TotalMass+=Actor->FindComponentByClass<UPrimitiveComponent>()->GetMass();
 	}
 	
 	return TotalMass;
