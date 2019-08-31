@@ -22,7 +22,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	//UPhysicsHandleComponent* HandleComponent;
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
