@@ -4,7 +4,7 @@
 #include "InventoryCharacter.h"
 #include "Inventory/Interactable.h"
 #include "Inventory/AutoPickup.h"
-#include "Inventory/InventoryItem.h"
+#include "Inventory/InvItem.h"
 #include "Player/EscapeFromRoomPlayerController.h"
 
 // Sets default values
@@ -42,7 +42,12 @@ AInventoryCharacter::AInventoryCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
+	// Create a FirstPerson came
+	FirstPersonCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
+	FirstPersonCamera->SetupAttachment(GetMesh(), FName("head"));
+	FirstPersonCamera->bUsePawnControlRotation = true;
 
+	FirstPersonCamera->bAutoActivate = false;
 
 	//Create the collection sphere
 	CollectionSphere = CreateDefaultSubobject<USphereComponent>(FName("CollectionSphere"));
@@ -77,6 +82,22 @@ void AInventoryCharacter::MoveRight(float Value)
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 		// add movement in that direction
 		AddMovementInput(Direction, Value);
+	}
+}
+
+void AInventoryCharacter::ChangeCamera()
+{
+	if(FollowCamera->IsActive())
+	{
+		GetMesh()->SetVisibility(false);
+		FollowCamera->SetActive(false);
+		FirstPersonCamera->SetActive(true);
+	}
+	else
+	{		
+		GetMesh()->SetVisibility(true);
+		FollowCamera->SetActive(true);
+		FirstPersonCamera->SetActive(false);
 	}
 }
 
@@ -155,20 +176,19 @@ void AInventoryCharacter::Tick(float DeltaTime)
 void AInventoryCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
+	
 	// Set up gameplay key bindings
 	check(PlayerInputComponent);
+
+	PlayerInputComponent->BindAction("ChangeCamera", IE_Pressed, this, &AInventoryCharacter::ChangeCamera);
+
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &AInventoryCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AInventoryCharacter::MoveRight);
 
-	// We have 2 versions of the rotation bindings to handle different kinds of devices differently
-	// "turn" handles devices that provide an absolute delta, such as a mouse.
-	// "turnrate" is for devices that we choose to treat as a rate of change, such as an analog joystick
 	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
-
 }
 

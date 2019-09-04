@@ -3,7 +3,7 @@
 
 #include "EscapeFromRoomPlayerController.h"
 #include "EscapeFromRoomGameState.h"
-#include "InventoryCharacter.h"
+//#include "InventoryCharacter.h"
 
 AEscapeFromRoomPlayerController::AEscapeFromRoomPlayerController()
 {
@@ -13,20 +13,24 @@ AEscapeFromRoomPlayerController::AEscapeFromRoomPlayerController()
 
 int32 AEscapeFromRoomPlayerController::GetInventoryWeight()
 {
+	
 	int32 Weight = 0;
+	
 	for (auto& Item : Inventory)
 	{
 		Weight += Item.Weight;
 	}
-
+	
 	return Weight;
 }
 
 bool AEscapeFromRoomPlayerController::AddItemToInventoryByID(FName ID)
 {
+	
 	AEscapeFromRoomGameState* GameState = Cast<AEscapeFromRoomGameState>(GetWorld()->GetGameState());
 	UDataTable* ItemTable = GameState->GetItemDB();
-	FInventoryItem* ItemToAdd = ItemTable->FindRow<FInventoryItem>(ID, "");
+	
+	FInvItem* ItemToAdd = ItemTable->FindRow<FInvItem>(ID, "");
 
 	if (ItemToAdd)
 	{
@@ -37,15 +41,18 @@ bool AEscapeFromRoomPlayerController::AddItemToInventoryByID(FName ID)
 			return true;
 		}
 	}
+	
 	return false;
 }
 
 void AEscapeFromRoomPlayerController::Interact()
 {
+	
 	if (CurrentInteractable)
 	{
 		CurrentInteractable->Interact(this);
 	}
+	
 }
 
 void AEscapeFromRoomPlayerController::SetupInputComponent()

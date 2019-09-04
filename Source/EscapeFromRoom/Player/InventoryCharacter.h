@@ -19,9 +19,14 @@ class ESCAPEFROMROOM_API AInventoryCharacter : public ACharacter
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 		class UCameraComponent* FollowCamera;
 
+	/** Person camera */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
+		UCameraComponent* FirstPersonCamera;
+
 	/** Collection sphere */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 		class USphereComponent* CollectionSphere;
+
 public:
 	// Sets default values for this character's properties
 	AInventoryCharacter();
@@ -42,6 +47,8 @@ protected:
 	/** Called for side to side input */
 	void MoveRight(float Value);
 
+	//Called for change camera
+	void ChangeCamera();
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
