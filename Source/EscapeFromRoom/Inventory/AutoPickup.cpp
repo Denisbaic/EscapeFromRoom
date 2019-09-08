@@ -18,6 +18,7 @@ AAutoPickup::AAutoPickup()
 void AAutoPickup::Collect_Implementation(APlayerController* Controller)
 {
 	AEscapeFromRoomPlayerController* PlayerController = Cast<AEscapeFromRoomPlayerController>(Controller);
+
 	if (PlayerController->AddItemToInventoryByID(ItemID))
 		Destroy();
 }

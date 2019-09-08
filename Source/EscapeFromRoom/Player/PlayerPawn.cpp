@@ -67,10 +67,7 @@ void APlayerPawn::CheckForInteractables()
 	FCollisionQueryParams QueryParams;
 	QueryParams.AddIgnoredActor(this);
 
-	if(ensure(GetController()))
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Here"));
-	}
+
 		AEscapeFromRoomPlayerController* PlayerController = Cast<AEscapeFromRoomPlayerController>(GetController());
 
 	if (PlayerController)

@@ -3,7 +3,6 @@
 
 #include "EscapeFromRoomPlayerController.h"
 #include "EscapeFromRoomGameState.h"
-//#include "InventoryCharacter.h"
 
 AEscapeFromRoomPlayerController::AEscapeFromRoomPlayerController()
 {
@@ -44,6 +43,8 @@ bool AEscapeFromRoomPlayerController::AddItemToInventoryByID(FName ID)
 	
 	return false;
 }
+
+
 
 void AEscapeFromRoomPlayerController::Interact()
 {

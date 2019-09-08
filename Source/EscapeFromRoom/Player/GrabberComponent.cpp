@@ -90,10 +90,8 @@ FHitResult UGrabberComponent::GetItemByRayCast() const
 
 	const FCollisionQueryParams TraceParams(FName(TEXT("InteractTrace")), true,GetOwner());
 
-	if(GetWorld()->LineTraceSingleByObjectType(HitResult, GetReachLineStart(), EndLocation, FCollisionObjectQueryParams(ECC_PhysicsBody), TraceParams))
-	{
-		UE_LOG(LogTemp, Warning, TEXT("%s"), *HitResult.Actor.Get()->GetName());
-	}
+	GetWorld()->LineTraceSingleByObjectType(HitResult, GetReachLineStart(), EndLocation, FCollisionObjectQueryParams(ECC_PhysicsBody), TraceParams);
+
 
 	
 	return HitResult;
