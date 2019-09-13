@@ -11,6 +11,7 @@ UOpenDoorComponent::UOpenDoorComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
+	
 }
 
 
@@ -20,40 +21,13 @@ void UOpenDoorComponent::BeginPlay()
 	Super::BeginPlay();
 }
 
-float UOpenDoorComponent::GetTotalMassOfActorsOnPlate() const
-{
-	if (!TriggerVolume)
-		return 0.f;
 
-	TArray<AActor*> OverlappingActors;
-	float TotalMass = 0.f;
-
-	TriggerVolume->GetOverlappingActors(OverlappingActors);
-
-	TArray<UPrimitiveComponent*> OverlappingComponents;
-	TriggerVolume->GetOverlappingComponents(OverlappingComponents);
-
-	for(const auto& Actor: OverlappingActors)
-	{
-		TotalMass+=Actor->FindComponentByClass<UPrimitiveComponent>()->GetMass();
-	}
-	
-	return TotalMass;
-}
 
 
 // Called every frame
+
 void UOpenDoorComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// Poll the Trigger Volume
-	if (GetTotalMassOfActorsOnPlate() > TriggerMass)
-	{
-		DoorOpenEvent.Broadcast();
-	}
-	else
-	{
-		DoorCloseEvent.Broadcast();
-	}
 }

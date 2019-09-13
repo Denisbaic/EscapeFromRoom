@@ -4,30 +4,33 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "OpenDoorComponent.generated.h"
+#include "OpenDoorComponent.h"
+#include "CheckPlayerInvDoorComponent.generated.h"
 
-class ATriggerVolume;
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDoorEvent);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class ESCAPEFROMROOM_API UOpenDoorComponent : public UActorComponent
+class ESCAPEFROMROOM_API UCheckPlayerInvDoorComponent : public UOpenDoorComponent
 {
 	GENERATED_BODY()
 
 public:	
 	// Sets default values for this component's properties
-	UOpenDoorComponent();
+	UCheckPlayerInvDoorComponent();
 
-	UPROPERTY(BlueprintAssignable)
-		FDoorEvent DoorOpenEvent;
-	UPROPERTY(BlueprintAssignable)
-		FDoorEvent DoorCloseEvent;
+	UPROPERTY(EditInstanceOnly, BlueprintReadWrite)
+		FName ItemId;
+
+	UPROPERTY(EditInstanceOnly, BlueprintReadWrite)
+		ATriggerVolume* TriggerVolume;
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
 public:
+
+	UFUNCTION()
+		void CheckInventory(AActor* OverlappedActor, AActor* OtherActor);
+
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 

@@ -92,23 +92,21 @@ FHitResult UGrabberComponent::GetItemByRayCast() const
 
 	GetWorld()->LineTraceSingleByObjectType(HitResult, GetReachLineStart(), EndLocation, FCollisionObjectQueryParams(ECC_PhysicsBody), TraceParams);
 
-
-	
 	return HitResult;
 }
+
 
 void UGrabberComponent::Grab()
 {
 	const FHitResult HitResult = GetItemByRayCast();
-	const auto ActorHit = HitResult.Actor;
-
-	if(!ActorHit.Get())
+	if (!HitResult.Actor.Get())
 		return;
+
 
 	const auto ComponentUnderHit = HitResult.Component.Get();
 
-	PhysicsHandle->GrabComponent(ComponentUnderHit, NAME_None, ComponentUnderHit->GetOwner()->GetActorLocation(), true);
-
+	//PhysicsHandle->GrabComponent(ComponentUnderHit, NAME_None, ComponentUnderHit->GetOwner()->GetActorLocation(), true);
+	PhysicsHandle->GrabComponentAtLocationWithRotation(ComponentUnderHit, NAME_None, ComponentUnderHit->GetOwner()->GetActorLocation(), ComponentUnderHit->GetOwner()->GetActorRotation());
 }
 
 void UGrabberComponent::Release()
