@@ -4,40 +4,32 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "GrabberComponent.generated.h"
+#include "TurretComponent.generated.h"
 
-class UPhysicsHandleComponent;
-
+class AProjectile;
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class ESCAPEFROMROOM_API UGrabberComponent : public UActorComponent
+class ESCAPEFROMROOM_API UTurretComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:
-	void SetupInputComponent();
+public:	
 	// Sets default values for this component's properties
-	UGrabberComponent();
-
-	UPROPERTY(BlueprintReadWrite,EditAnywhere)
-	float RayLength = 100.f;
-	
-
-	UPhysicsHandleComponent* PhysicsHandle;
-	
+	UTurretComponent();
+	UPROPERTY(EditAnywhere)
+		float ProjectileSpeed=200.f;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		TSubclassOf<AProjectile> Bullet;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		UStaticMeshComponent* Trunk;
+	UFUNCTION(BlueprintCallable)
+		void Fire();
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
-	bool bCanGrab = true;
+
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	void FindPhysicsHandleComponent();
-	FVector GetReachLineStart() const;
-	FVector GetReachLineEnd() const;
-	FHitResult GetItemByRayCast() const;
 
-
-	void Grab();
-	void Release();
-	void Throw();
+		
 };

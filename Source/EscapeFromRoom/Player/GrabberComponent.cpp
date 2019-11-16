@@ -5,6 +5,7 @@
 #include "Engine/World.h"
 #include "Runtime/Engine/Classes/PhysicsEngine/PhysicsHandleComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "DrawDebugHelpers.h"
 #include "Components/PrimitiveComponent.h"
 
 // Sets default values for this component's properties
@@ -23,6 +24,7 @@ void UGrabberComponent::BeginPlay()
 	Super::BeginPlay();
 	FindPhysicsHandleComponent();
 	SetupInputComponent();
+
 }
 
 
@@ -53,6 +55,7 @@ void UGrabberComponent::SetupInputComponent()
 	{
 		GetOwner()->InputComponent->BindAction("GetItem", IE_Pressed, this, &UGrabberComponent::Grab);
 		GetOwner()->InputComponent->BindAction("GetItem", IE_Released, this, &UGrabberComponent::Release);
+		GetOwner()->InputComponent->BindAction("ThrowItem", IE_Pressed, this, &UGrabberComponent::Throw);
 	}
 	else
 	{
@@ -98,18 +101,39 @@ FHitResult UGrabberComponent::GetItemByRayCast() const
 
 void UGrabberComponent::Grab()
 {
+	if(!bCanGrab)
+		return;
+	bCanGrab = false;
 	const FHitResult HitResult = GetItemByRayCast();
 	if (!HitResult.Actor.Get())
 		return;
 
-
 	const auto ComponentUnderHit = HitResult.Component.Get();
 
-	//PhysicsHandle->GrabComponent(ComponentUnderHit, NAME_None, ComponentUnderHit->GetOwner()->GetActorLocation(), true);
 	PhysicsHandle->GrabComponentAtLocationWithRotation(ComponentUnderHit, NAME_None, ComponentUnderHit->GetOwner()->GetActorLocation(), ComponentUnderHit->GetOwner()->GetActorRotation());
 }
 
 void UGrabberComponent::Release()
 {
+	bCanGrab = true;
+	if(!PhysicsHandle)
+		return;
 	PhysicsHandle->ReleaseComponent();
+}
+
+
+
+void UGrabberComponent::Throw()
+{
+	if(!PhysicsHandle->GetGrabbedComponent())
+		return;
+	FVector PlayerLocation;
+	FRotator ForceVector;
+	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
+		PlayerLocation,
+		ForceVector
+	);
+	PhysicsHandle->GetGrabbedComponent()->AddForce(ForceVector.Vector() *1000000.f);
+	
+	Release();
 }
