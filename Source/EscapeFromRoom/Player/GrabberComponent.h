@@ -14,7 +14,7 @@ class ESCAPEFROMROOM_API UGrabberComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
-	void SetupInputComponent();
+	virtual void SetupInputComponent();
 	// Sets default values for this component's properties
 	UGrabberComponent();
 
@@ -37,7 +37,7 @@ public:
 	FHitResult GetItemByRayCast() const;
 
 
-	void Grab();
-	void Release();
+	virtual void Grab();
+	virtual void Release();
 	void Throw();
 };

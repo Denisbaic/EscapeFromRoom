@@ -7,6 +7,7 @@
 #include "Runtime/Engine/Classes/GameFramework/Actor.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/PlayerPawn.h"
+#include "GameFramework/Character.h"
 
 // Sets default values for this component's properties
 UCheckPlayerInvDoorComponent::UCheckPlayerInvDoorComponent()
@@ -30,13 +31,16 @@ void UCheckPlayerInvDoorComponent::BeginPlay()
 void UCheckPlayerInvDoorComponent::CheckInventory(AActor* OverlappedActor, AActor* OtherActor)
 {
 	
-	APlayerPawn* PlayerPawn = Cast<APlayerPawn>(OtherActor);
+	ACharacter* PlayerCharacter = Cast<ACharacter>(OtherActor);
 
-	if(!PlayerPawn)
+	if(!PlayerCharacter)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("THIS IS NOT CHARACTER"));
 		return;
-
-	AEscapeFromRoomPlayerController* PlayerController= Cast<AEscapeFromRoomPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	
+	}
+		
+	//AEscapeFromRoomPlayerController* PlayerController= Cast<AEscapeFromRoomPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	AEscapeFromRoomPlayerController* PlayerController = Cast<AEscapeFromRoomPlayerController>(PlayerCharacter->GetController());
 	for (FInvItem InvItem : PlayerController->Inventory)
 	{
 		if(InvItem.ItemID==ItemId)

@@ -14,6 +14,7 @@ class ESCAPEFROMROOM_API APlayerPawn : public ADefaultPawn
 {
 	GENERATED_BODY()
 
+
 public:
 	// Sets default values for this pawn's properties
 	APlayerPawn();
@@ -21,6 +22,7 @@ public:
 	/** Collection sphere */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 		class USphereComponent* CollectionSphere;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
