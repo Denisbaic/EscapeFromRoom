@@ -35,7 +35,6 @@ void UCheckPlayerInvDoorComponent::CheckInventory(AActor* OverlappedActor, AActo
 
 	if(!PlayerCharacter)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("THIS IS NOT CHARACTER"));
 		return;
 	}
 		
