@@ -14,7 +14,7 @@
 ACombLock::ACombLock()
 {
 	//////
-	std::ifsteam a;
+	//std::ifsteam a;
 	
 	//////
 	PrimaryActorTick.bCanEverTick = true;
@@ -33,6 +33,8 @@ bool ACombLock::Compare_Implementation()
 void ACombLock::DeleteLast_Implementation()
 {
 	auto TempString = ScreenText->Text.ToString();
+	if(TempString.Len()==0)
+		return;
 	TempString.RemoveAt(0);
 	ScreenText->SetText(FText::FromString(TempString));
 }
